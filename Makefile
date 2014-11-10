@@ -23,7 +23,7 @@ YACC?=bison
 YFLAGS?=-dv
 
 LLVM_CC_FLAGS=`llvm-config --cflags`
-LLVM_LINK_FLAGS=`llvm-config --libs --cflags --ldflags core analysis executionengine jit interpreter native`
+LLVM_LINK_FLAGS=`llvm-config --libs --cflags --ldflags core analysis executionengine jit interpreter native` -ldl -lpthread
 
 ################################################################################
 # Default Target
@@ -47,7 +47,7 @@ src/kaleidoscope.o: src/kaleidoscope.c
 	${CC} ${LLVM_CC_FLAGS} ${CFLAGS} -c -o $@ $^
 
 build/kaleidoscope: ${OBJECTS}
-	$(CXX) $(LLVM_LINK_FLAGS) $(CXXFLAGS) -rdynamic -Isrc -o $@ src/kaleidoscope.o build/libkaleidoscope.a
+	$(CXX) $(CXXFLAGS) -rdynamic -Isrc -o $@ src/kaleidoscope.o build/libkaleidoscope.a $(LLVM_LINK_FLAGS)
 	chmod 700 $@
 
 build:
@@ -92,7 +92,7 @@ build/tests/codegen_tests.o: tests/codegen_tests.c build/libkaleidoscope.a
 	$(CC) $(LLVM_CC_FLAGS) $(CFLAGS) -Isrc -c -o $@ tests/codegen_tests.c build/libkaleidoscope.a
 
 build/tests/codegen_tests: build/tests/codegen_tests.o build/libkaleidoscope.a
-	$(CXX) $(LLVM_LINK_FLAGS) $(CXXFLAGS) -Isrc -o $@ build/tests/codegen_tests.o build/libkaleidoscope.a
+	$(CXX) $(CXXFLAGS) -Isrc -o $@ build/tests/codegen_tests.o build/libkaleidoscope.a $(LLVM_LINK_FLAGS)
 
 
 ################################################################################
